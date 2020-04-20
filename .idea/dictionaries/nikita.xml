@@ -3,6 +3,11 @@
     <words>
       <w>bootcamp</w>
       <w>bootcamps</w>
+      <w>forgotpassword</w>
+      <w>resetpassword</w>
+      <w>resettokent</w>
+      <w>updatedetails</w>
+      <w>updatepassword</w>
     </words>
   </dictionary>
 </component>
