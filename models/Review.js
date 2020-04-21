@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const Bootcamp = require('./Bootcamp');
 
 const ReviewSchema = new mongoose.Schema({
   title: {
@@ -31,6 +32,39 @@ const ReviewSchema = new mongoose.Schema({
     ref: 'User',
     required: true
   }
+});
+
+ReviewSchema.statics.getAverageRating = async function(bootcampId) {
+  const obj = await this.aggregate([
+    {
+      $match: { bootcamp: bootcampId }
+    },
+    {
+      $group: {
+        _id: '$bootcamp',
+        averageRating: { $avg: '$rating' }
+      }
+    }
+  ]);
+  try {
+    await Bootcamp.findByIdAndUpdate(
+      bootcampId,
+      { averageRating: obj[0].averageRating },
+      {
+        new: true,
+        runValidators: true
+      }
+    );
+  } catch (e) {
+    console.log(e);
+  }
+};
+ReviewSchema.post('save', function() {
+  this.constructor.getAverageRating(this.bootcamp);
+});
+
+ReviewSchema.pre('remove', function() {
+  this.constructor.getAverageRating(this.bootcamp);
 });
 
 module.exports = mongoose.model('Review', ReviewSchema);

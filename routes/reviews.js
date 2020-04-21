@@ -4,7 +4,9 @@ const router = Router({ mergeParams: true });
 const {
   getReviews,
   getReview,
-  createReview
+  createReview,
+  updateReview,
+  deleteReview
 } = require('../controllers/reviews');
 
 const advancedResults = require('../middleware/advancedResults');
@@ -20,7 +22,12 @@ router
     }),
     getReviews
   )
-  .post(protect, authorized('user','admin'), createReview);
-router.route('/:id').get(getReview);
+  .post(protect, authorized('user', 'admin'), createReview);
+
+router
+  .route('/:id')
+  .get(getReview)
+  .put(protect, authorized('user', 'admin'), updateReview)
+  .delete(protect, authorized('user', 'admin'), deleteReview);
 
 module.exports = router;

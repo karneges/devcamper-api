@@ -54,3 +54,62 @@ exports.createReview = asyncHandler(async (req, res, next) => {
     data: review
   });
 });
+
+//@desc         update review
+//@route        PUT /api/v1/reviews/:id
+//@access       Private
+exports.updateReview = asyncHandler(async (req, res, next) => {
+  const { id, role } = req.user;
+  let review = await Review.findById(req.params.id);
+  if (!review) {
+    return next(
+      new ErrorHandler(`No review with the id of ${req.params.id}`, 404)
+    );
+  }
+  //Make sure user is course owner
+  if (review.user.toString() !== id && role !== 'admin') {
+    return next(
+      new ErrorHandler(
+        `User with ID ${id} not authorized to change review  ${review.id}`,
+        401
+      )
+    );
+  }
+
+  review = await Review.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
+    runValidators: true
+  });
+  res.status(200).json({
+    success: true,
+    data: review
+  });
+});
+
+//@desc         delete review
+//@route        delete /api/v1/reviews/:id
+//@access       Private
+exports.deleteReview = asyncHandler(async (req, res, next) => {
+  const { id, role } = req.user;
+  let review = await Review.findById(req.params.id);
+  if (!review) {
+    return next(
+      new ErrorHandler(`No review with the id of ${req.params.id}`, 404)
+    );
+  }
+  //Make sure user is course owner
+  if (review.user.toString() !== id && role !== 'admin') {
+    return next(
+      new ErrorHandler(
+        `User with ID ${id} not authorized to change review  ${review.id}`,
+        401
+      )
+    );
+  }
+
+  review.remove();
+  res.status(200).json({
+    success: true,
+    data: {}
+  });
+});

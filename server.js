@@ -7,6 +7,10 @@ const connectDB = require('./config/db');
 const errHandler = require('./middleware/error');
 const expressFileUpload = require('express-fileupload');
 const cookieParser = require('cookie-parser');
+const sanitize = require('express-mongo-sanitize');
+const helmet = require('helmet');
+const xss = require('xss-clean');
+const cors = require('cors');
 //Load env vars
 dotenv.config({ path: './config/config.env' });
 
@@ -33,6 +37,17 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Use cookie-parser
 app.use(cookieParser());
+
+//Use sanitize
+app.use(sanitize());
+
+// Set security
+app.use(helmet());
+
+// Prevent xss
+app.use(xss());
+//Enable CORS
+app.use(cors());
 
 //Dev logging middleware
 if (process.env.NODE_ENV === 'development') {
